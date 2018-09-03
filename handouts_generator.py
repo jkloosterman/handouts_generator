@@ -56,7 +56,12 @@ class HandoutGenerator(object):
                          
                      num_thumbnails += 1
                      i += 1
-                self.fp.write("\\vspace{.5in}\\\\\n")
+
+                if num_thumbnails % 2 == 1:
+                    self.fp.write(r"\includegraphics[width=3.5in]{lines.pdf}")
+                     
+                self.fp.write("\\vspace{.5in}\n")
+
                 i -= 1
             elif self.slides[i]["size"] == "normal":
                 self.emit_normal(self.slides[i]["pdf"])
@@ -74,7 +79,8 @@ class HandoutGenerator(object):
     def emit_normal(self, pdf_file):
         self.fp.write(
             r"""\fbox{\includegraphics[width=3.5in]{%s}}
-            \hspace*{\fill}
+            \hfill
+            \includegraphics[width=3.5in]{lines.pdf}
             \vspace{.5in} \\
             """ % (pdf_file,))
 
@@ -82,7 +88,7 @@ class HandoutGenerator(object):
         self.fp.write(
             r"""\centering {
             \hspace*{\fill}
-            \fbox{\includegraphics[width=6in]{%s}}
+            \fbox{\includegraphics[width=6.5in]{%s}}
             \hspace*{\fill}
             \vspace{1in} \\
             }""" % (pdf_file,))        
@@ -95,8 +101,8 @@ class HandoutGenerator(object):
         saved_path = os.getcwd()
         os.chdir(self.folder)
         os.system("pdflatex handouts.tex")
-#        os.system("mv handouts.pdf handouts.orig.pdf")
-#        os.system("ps2pdf handouts.orig.pdf handouts.pdf")
+        os.system("mv handouts.pdf handouts.orig.pdf")
+        os.system("gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/printer -dNOPAUSE -dQUIET -dBATCH -sOutputFile=handouts.pdf handouts.orig.pdf")
         os.chdir(saved_path)
         
 def main():
@@ -114,7 +120,8 @@ def main():
     # create page pdfs folder
     pdf_pages = folder + "/pdf_pages/"
     os.mkdir(pdf_pages)
-
+    os.system("cp lines.pdf %s" % (folder,))
+    
     # split the PDF into individual pages
     num_pages = split_pdf(pdf, pdf_pages)
 
