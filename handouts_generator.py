@@ -47,7 +47,7 @@ class HandoutGenerator(object):
             if self.slides[i]["size"] == "thumbnail":
 #                self.fp.write("{\n")
                 num_thumbnails = 0
-                while self.slides[i]["size"] == "thumbnail" and i < len(self.slides):
+                while i < len(self.slides) and self.slides[i]["size"] == "thumbnail":
                      self.emit_thumbnail(self.slides[i]["pdf"])
                      if num_thumbnails % 2 == 1:
                          self.fp.write("\\vspace{.5in}\n")
@@ -58,9 +58,8 @@ class HandoutGenerator(object):
                      i += 1
 
                 if num_thumbnails % 2 == 1:
-                    self.fp.write(r"\includegraphics[width=3.5in]{lines.pdf}")
-                     
-                self.fp.write("\\vspace{.5in}\n")
+                    self.fp.write(r"\includegraphics[width=3.5in]{lines.pdf}")                     
+                    self.fp.write("\\vspace{.5in}\n\n")
 
                 i -= 1
             elif self.slides[i]["size"] == "normal":
@@ -78,20 +77,24 @@ class HandoutGenerator(object):
         
     def emit_normal(self, pdf_file):
         self.fp.write(
-            r"""\fbox{\includegraphics[width=3.5in]{%s}}
+            r"""
+            \fbox{\includegraphics[width=3.5in]{%s}}
             \hfill
             \includegraphics[width=3.5in]{lines.pdf}
-            \vspace{.5in} \\
+            \vspace{.5in}
+
             """ % (pdf_file,))
 
     def emit_large(self, pdf_file):
         self.fp.write(
             r"""\centering {
             \hspace*{\fill}
-            \fbox{\includegraphics[width=6.5in]{%s}}
+            \fbox{\includegraphics[width=5.9in]{%s}}
             \hspace*{\fill}
-            \vspace{1in} \\
-            }""" % (pdf_file,))        
+            \vspace{.5in}
+            }
+            
+            """ % (pdf_file,))        
 
     def close(self):
         self.fp.write("\\end{document}\n")
